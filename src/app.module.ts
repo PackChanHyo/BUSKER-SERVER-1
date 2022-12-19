@@ -1,7 +1,7 @@
 import { MembersModule } from './apis/members/members.module';
 import { FilesModule } from './apis/files/files.modules';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { CacheModule, Module } from '@nestjs/common';
+import { CacheModule, flatten, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -16,6 +16,7 @@ import { LikeArtistModule } from './apis/likeArtist/likeArtist.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { CommentModule } from './apis/comments/comment.module';
 import { MapModule } from './apis/map/map.module';
+import { AppController } from './app.controller';
 import { DistrictModule } from './apis/district/district.module';
 import { CategoryModule } from './apis/categories/categories.module';
 import { CityModule } from './apis/city/city.module';
@@ -40,10 +41,17 @@ import { CityModule } from './apis/city/city.module';
       autoSchemaFile: './common/graphql/schema.gql',
       context: ({ req, res }) => ({ req, res }),
       cors: {
-        origin: 'https://busker.shop',
-        exposedHeaders: '*',
-        optionsSuccessStatus: 200,
+        origin: ['http://localhost:3000', 'https://busker.shop'],
         credentials: true,
+        exposedHeaders: ['Set-Cookie', 'Cookie'],
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+        allowedHeaders: [
+          'Access-Control-Allow-Headers',
+          'Authorization',
+          'X-Requested-With',
+          'Content-Type',
+          'Accept',
+        ],
       },
     }),
     MailerModule.forRoot({
@@ -77,5 +85,6 @@ import { CityModule } from './apis/city/city.module';
     }),
   ],
   providers: [],
+  controllers: [AppController],
 })
 export class AppModule {}

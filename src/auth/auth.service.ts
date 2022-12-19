@@ -1,5 +1,6 @@
 import {
   CACHE_MANAGER,
+  ConflictException,
   Inject,
   Injectable,
   UnauthorizedException,
@@ -14,6 +15,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserAuthority } from 'src/commons/role/entity/userAuthority.entity';
 import { Repository } from 'typeorm';
 import { RoleType } from 'src/commons/role/type/role-type';
+import { User } from 'src/apis/users/entity/user.entity';
+import { ConfigModule } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -24,18 +27,35 @@ export class AuthService {
     private readonly cacheManager: Cache,
     @InjectRepository(UserAuthority)
     private readonly userAuthorityRepository: Repository<UserAuthority>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
-  setRefreshToken({ user, res }) {
+  setRefreshToken({ user, res, req }) {
     const refreshToken = this.jwtService.sign(
       { email: user.email, sub: user.id },
       { secret: 'myRefreshKey', expiresIn: '2w' },
     );
-    const result = res.setHeader(
-      'Set-Cookie',
-      `refreshToken=${refreshToken}; path=/;`,
+    const originList = ['http://localhost:3000', 'https://busker.shop'];
+    const origin = req.headers.origin;
+    if (originList.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin); //프론트와 연결
+    }
+
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader(
+      'Access-Control-Allow-Methods',
+      'GET, HEAD, POST, OPTIONS, PUT',
+    ); //method 지정
+    res.setHeader(
+      'Access-Control-Allow-Headers',
+      'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
     );
-    return result;
+    res.setHeader(
+      'Set-Cookie',
+      `refreshToken=${refreshToken}; path=/; domain=.chansweb.shop; SameSite=None; Secure; httpOnly;`,
+    );
+    return refreshToken;
   }
 
   async getAccessToken({ user }) {
@@ -48,7 +68,7 @@ export class AuthService {
         sub: user.id,
         role: role.authority,
       },
-      { secret: process.env.ACCESS_SECRET, expiresIn: '10m' },
+      { secret: process.env.ACCESS_SECRET, expiresIn: '1h' },
     );
   }
 
@@ -72,13 +92,21 @@ export class AuthService {
         );
       }
     } else {
-      this.setRefreshToken({ user, res: context.res });
+      await this.userService.updatePassword({
+        userId: user.id,
+        password,
+      });
+      this.setRefreshToken({
+        user,
+        res: context.res,
+        req: context.req,
+      });
       //
       return this.getAccessToken({ user });
     }
   }
 
-  async buskerLogout({ context }) {
+  async buskerLogout({ context, res, req }) {
     try {
       const accessToken = await context.req.headers['authorization'].replace(
         'bearer ',
@@ -88,37 +116,49 @@ export class AuthService {
         'refreshToken=',
         '',
       );
-      const accessVerification = jwt.verify(accessToken, 'myAccessKey');
-      console.log('accessToken OK');
-      console.log(jwt.verify(accessToken, 'myAccessKey'));
-      const refreshVerification = jwt.verify(refreshToken, 'myRefreshKey');
-      console.log('refreshToken OK');
-      console.log(jwt.verify(refreshToken, 'myRefreshKey'));
 
-      const currentTime = new Date();
-      const currentSec = Math.abs(currentTime.getTime() / 1000);
-
-      const ttl_access = Math.ceil(accessVerification['exp'] - currentSec);
-      const ttl_refresh = Math.ceil(refreshVerification['exp'] - currentSec);
-
-      console.log('===============================');
-      console.log(ttl_access, ttl_refresh);
-
-      await this.cacheManager.set(`accessToken:${accessToken}`, 'accessToken', {
-        ttl: ttl_access,
-      });
-
-      await this.cacheManager.set(
-        `refreshToken:${refreshToken}`,
-        'refreshToken',
+      const saveAccess = await this.cacheManager.set(
+        `accessToken:${accessToken}`,
+        'accessToken',
         {
-          ttl: ttl_refresh,
+          ttl: 0,
         },
       );
 
-      return '로그아웃에 성공했습니다.';
+      const saveRefresh = await this.cacheManager.set(
+        `refreshToken:${refreshToken}`,
+        'refreshToken',
+        {
+          ttl: 0,
+        },
+      );
+      // 쿠키 지움
+      const originList = ['http://localhost:3000', 'https://busker.shop'];
+      const origin = req.headers.origin;
+      if (originList.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin); //프론트와 연결
+      }
+
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      res.setHeader(
+        'Access-Control-Allow-Methods',
+        'GET, HEAD, POST, OPTIONS, PUT',
+      );
+      res.setHeader(
+        'Access-Control-Allow-Headers',
+        'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
+      );
+      res.setHeader(
+        'Set-Cookie',
+        `refreshToken=deleted; path=/; domain=.chansweb.shop; SameSite=None; Secure; httpOnly;`,
+      );
+      if (saveAccess === 'OK' && saveRefresh === 'OK') {
+        return true;
+      } else {
+        throw new UnauthorizedException('로그아웃을 실패했습니다.');
+      }
     } catch (e) {
-      throw new UnauthorizedException('로그아웃을 실패했습니다.');
+      throw new ConflictException('해당 사용자의 토큰이 올바르지 않습니다.');
     }
   }
 
@@ -136,7 +176,7 @@ export class AuthService {
     }
 
     // 3. 회원가입이 되어있다면? 로그인(refreshToken, accessToken 만들어서 프론트엔드에 주기)
-    this.setRefreshToken({ user, res });
-    res.redirect('http://localhost:5500/login/index.html');
+    this.setRefreshToken({ user, res, req });
+    res.redirect('http://localhost:3000');
   }
 }

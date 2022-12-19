@@ -1,7 +1,10 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 import { IContext } from 'src/commons/context';
-import { GqlAuthRefreshGuard } from 'src/commons/gql-auth.guard';
+import {
+  GqlAuthAccessGuard,
+  GqlAuthRefreshGuard,
+} from 'src/commons/gql-auth.guard';
 import { CurrentUser } from 'src/commons/gql-user.param';
 import { AuthService } from './auth.service';
 
@@ -23,12 +26,16 @@ export class AuthResolver {
       context,
     });
   }
-  @UseGuards()
-  @Mutation(() => String)
+  @UseGuards(GqlAuthAccessGuard)
+  @Mutation(() => Boolean)
   async logout(
     @Context() context: IContext, //
   ) {
-    return this.authService.buskerLogout({ context });
+    return this.authService.buskerLogout({
+      context,
+      res: context.res,
+      req: context.req,
+    });
   }
 
   @UseGuards(GqlAuthRefreshGuard)
