@@ -15,20 +15,12 @@ import { Boards } from './entites/boards.entity';
 export class BoardsResolver {
   constructor(private readonly boardsService: BoardsService) {}
 
+  @UseGuards(GqlAuthAccessGuard)
   @Query(() => [Boards])
-  async fetchBoardsBySearch(
-    @Args({ name: 'searchBoardInput', nullable: true })
-    searchBoardInput: SearchBoardInput,
+  async fetchBoards(
+    @Args('page') page: string, //
   ) {
-    const result = await this.boardsService.findSearch({
-      searchBoardInput,
-    });
-    return result;
-  }
-
-  @Query(() => [Boards])
-  async fetchBoards() {
-    return await this.boardsService.findAll();
+    return await this.boardsService.findAll({ page });
   }
 
   @UseGuards(GqlAuthAccessGuard)
@@ -39,37 +31,32 @@ export class BoardsResolver {
     return await this.boardsService.findOne({ boardId });
   }
 
-  // @Query(() => [Boards])
-  // async fetchBoardByCategory(@Args('category') category: string) {
-  //   const result = await this.boardsService.findCategory({ category });
-  //   return result;
-  // }
-  // @Query(() => [Boards])
-  // async fetchBoardByAddress_city(@Args('city') city: string) {
-  //   const result = await this.boardsService.findCity({ city });
-  //   return result;
-  // }
-
-  // @Query(() => [Boards])
-  // async fetchBoardByAddress_district(@Args('district') district: string) {
-  //   const result = await this.boardsService.findDistrict({ district });
-
-  //   return result;
-  // }
-
+  // Args 카테고리 구역 으로 바꾸기
+  @UseGuards(GqlAuthAccessGuard)
   @Query(() => [Boards])
-  async fetchRecentBoards(@Args('artistId') artistId: string) {
-    return await this.boardsService.findRecent({ artistId });
+  async fetchBoardsBySearch(
+    @Args({ name: 'searchBoardInput', nullable: true })
+    searchBoardInput: SearchBoardInput,
+    @Args('time') time: Date,
+  ) {
+    const result = await this.boardsService.findSearch({
+      searchBoardInput,
+      time,
+    });
+    return result;
   }
 
-  @Mutation(() => Boolean)
-  deleteBoard(@Args('boardId') boardId: string) {
-    return this.boardsService.delete({ boardId });
+  @UseGuards(GqlAuthAccessGuard)
+  @Query(() => [Boards])
+  async fetchRecentBoards(
+    @Args('artistId') artistId: string,
+    @Args('time') time: Date,
+  ) {
+    return await this.boardsService.findRecent({ artistId, time });
   }
 
   @Roles(RoleType.ARTIST)
-  @UseGuards(RolesGuard)
-  @UseGuards(GqlAuthAccessGuard)
+  @UseGuards(GqlAuthAccessGuard, RolesGuard)
   @Mutation(() => Boards)
   async createBoards(
     @Args({ name: 'createBoardInput', nullable: true })
@@ -97,5 +84,12 @@ export class BoardsResolver {
       boardId,
       updateBoardInput,
     });
+  }
+
+  @Roles(RoleType.ARTIST)
+  @UseGuards(GqlAuthAccessGuard, RolesGuard)
+  @Mutation(() => Boolean)
+  deleteBoard(@Args('boardId') boardId: string) {
+    return this.boardsService.delete({ boardId });
   }
 }

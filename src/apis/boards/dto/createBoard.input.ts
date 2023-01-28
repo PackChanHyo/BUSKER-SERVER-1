@@ -9,11 +9,11 @@ export class CreateBoardInput {
   @Field(() => String)
   contents: string;
 
-  @Field(() => String, { nullable: true })
-  start_time: string;
+  @Field(() => Date, { nullable: true })
+  start_time: Date;
 
-  @Field(() => String, { nullable: true })
-  end_time: string;
+  @Field(() => Date, { nullable: true })
+  end_time: Date;
 
   @Field(() => String)
   category: string;

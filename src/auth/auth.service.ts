@@ -36,25 +36,26 @@ export class AuthService {
       { email: user.email, sub: user.id },
       { secret: 'myRefreshKey', expiresIn: '2w' },
     );
-    const originList = ['http://localhost:3000', 'https://busker.shop'];
-    const origin = req.headers.origin;
-    if (originList.includes(origin)) {
-      res.setHeader('Access-Control-Allow-Origin', origin); //프론트와 연결
-    }
+    res.setHeader('Set-Cookie', `refreshToken=${refreshToken}; path=/;`);
+    // const originList = ['http://localhost:3000', 'https://busker.shop'];
+    // const origin = req.headers.origin;
+    // if (originList.includes(origin)) {
+    //   res.setHeader('Access-Control-Allow-Origin', origin); //프론트와 연결
+    // }
 
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader(
-      'Access-Control-Allow-Methods',
-      'GET, HEAD, POST, OPTIONS, PUT',
-    ); //method 지정
-    res.setHeader(
-      'Access-Control-Allow-Headers',
-      'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
-    );
-    res.setHeader(
-      'Set-Cookie',
-      `refreshToken=${refreshToken}; path=/; domain=.chansweb.shop; SameSite=None; Secure; httpOnly;`,
-    );
+    // res.setHeader('Access-Control-Allow-Credentials', 'true');
+    // res.setHeader(
+    //   'Access-Control-Allow-Methods',
+    //   'GET, HEAD, POST, OPTIONS, PUT',
+    // ); //method 지정
+    // res.setHeader(
+    //   'Access-Control-Allow-Headers',
+    //   'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
+    // );
+    // res.setHeader(
+    //   'Set-Cookie',
+    //   `refreshToken=${refreshToken}; path=/; domain=.chansweb.shop; SameSite=None; Secure; httpOnly;`,
+    // );
     return refreshToken;
   }
 
@@ -107,59 +108,59 @@ export class AuthService {
   }
 
   async buskerLogout({ context, res, req }) {
-    try {
-      const accessToken = await context.req.headers['authorization'].replace(
-        'bearer ',
-        '',
-      );
-      const refreshToken = await context.req.headers['cookie'].replace(
-        'refreshToken=',
-        '',
-      );
+    // try {
+    const accessToken = await context.req.headers['authorization'].replace(
+      'bearer ',
+      '',
+    );
+    const refreshToken = await context.req.headers['cookie'].replace(
+      'refreshToken=',
+      '',
+    );
 
-      const saveAccess = await this.cacheManager.set(
-        `accessToken:${accessToken}`,
-        'accessToken',
-        {
-          ttl: 0,
-        },
-      );
+    const saveAccess = await this.cacheManager.set(
+      `accessToken:${accessToken}`,
+      'accessToken',
+      {
+        ttl: 0,
+      },
+    );
 
-      const saveRefresh = await this.cacheManager.set(
-        `refreshToken:${refreshToken}`,
-        'refreshToken',
-        {
-          ttl: 0,
-        },
-      );
-      // 쿠키 지움
-      const originList = ['http://localhost:3000', 'https://busker.shop'];
-      const origin = req.headers.origin;
-      if (originList.includes(origin)) {
-        res.setHeader('Access-Control-Allow-Origin', origin); //프론트와 연결
-      }
+    const saveRefresh = await this.cacheManager.set(
+      `refreshToken:${refreshToken}`,
+      'refreshToken',
+      {
+        ttl: 0,
+      },
+    );
+    //   // 쿠키 지움
+    //   const originList = ['http://localhost:3000', 'https://busker.shop'];
+    //   const origin = req.headers.origin;
+    //   if (originList.includes(origin)) {
+    //     res.setHeader('Access-Control-Allow-Origin', origin); //프론트와 연결
+    //   }
 
-      res.setHeader('Access-Control-Allow-Credentials', 'true');
-      res.setHeader(
-        'Access-Control-Allow-Methods',
-        'GET, HEAD, POST, OPTIONS, PUT',
-      );
-      res.setHeader(
-        'Access-Control-Allow-Headers',
-        'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
-      );
-      res.setHeader(
-        'Set-Cookie',
-        `refreshToken=deleted; path=/; domain=.chansweb.shop; SameSite=None; Secure; httpOnly;`,
-      );
-      if (saveAccess === 'OK' && saveRefresh === 'OK') {
-        return true;
-      } else {
-        throw new UnauthorizedException('로그아웃을 실패했습니다.');
-      }
-    } catch (e) {
-      throw new ConflictException('해당 사용자의 토큰이 올바르지 않습니다.');
+    //   res.setHeader('Access-Control-Allow-Credentials', 'true');
+    //   res.setHeader(
+    //     'Access-Control-Allow-Methods',
+    //     'GET, HEAD, POST, OPTIONS, PUT',
+    //   );
+    //   res.setHeader(
+    //     'Access-Control-Allow-Headers',
+    //     'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
+    //   );
+    //   res.setHeader(
+    //     'Set-Cookie',
+    //     `refreshToken=deleted; path=/; domain=.chansweb.shop; SameSite=None; Secure; httpOnly;`,
+    //   );
+    if (saveAccess === 'OK' && saveRefresh === 'OK') {
+      return true;
+    } else {
+      throw new UnauthorizedException('로그아웃을 실패했습니다.');
     }
+    // } catch (e) {
+    //   throw new ConflictException('해당 사용자의 토큰이 올바르지 않습니다.');
+    // }
   }
 
   async buskerSocialLogin({ req, res }) {

@@ -1,7 +1,7 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserAuthority } from 'src/commons/role/entity/userAuthority.entity';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Artist } from '../artists/entity/artist.entity';
 import { BoardAddress } from '../boardAddress/entity/boardAddress.entity';
 import { BoardImages } from '../boardImages/entity/boardImages.entity';
@@ -29,20 +29,252 @@ export class BoardsService {
     private readonly commentRepository: Repository<Comments>,
   ) {}
 
-  paging({ value, page }) {
-    value.sort(function (a, b) {
-      return b.createAt < a.createAt ? -1 : b.createAt > a.createAt ? 1 : 0;
+  async findAll({ page }) {
+    return await this.boardRepository
+      .createQueryBuilder('board')
+      .leftJoinAndSelect('board.category', 'category')
+      .leftJoinAndSelect('board.artist', 'artist')
+      .leftJoinAndSelect('board.boardAddress', 'boardAddress')
+      .leftJoinAndSelect('board.boardImageURL', 'boardImageURL')
+      .take(12)
+      .skip(page ? (page - 1) * 12 : 0)
+      .getMany();
+
+    // return await this.boardRepository.find({
+    //   relations: ['category', 'artist', 'boardAddress', 'boardImageURL'],
+    // });
+  }
+
+  async findOne({ boardId }) {
+    const result = await this.boardRepository.findOne({
+      where: {
+        id: boardId,
+      },
+      relations: [
+        'category',
+        'artist',
+        'boardAddress',
+        'comments',
+        'boardImageURL',
+      ],
     });
-    const arr = [];
-    for (let i = 0; i < value.length; i++) {
-      const temp = [];
-      for (let j = 0; j < 12; j++) {
-        temp.push(value.shift());
-        if (value.length === 0) break;
-      }
-      arr.push(temp);
+
+    if (!result) {
+      throw new UnprocessableEntityException('잘못된 조회입니다.');
     }
-    return arr[page - 1];
+
+    return result;
+  }
+
+  // 장르별, 카테고리별 지역별  api를 따로 만들거나 압축하기 (제안)
+  // const 조건만 적고 if문 작성
+  async findSearch({ searchBoardInput, time }) {
+    const find = this.boardRepository
+      .createQueryBuilder('board')
+      .leftJoinAndSelect('board.category', 'category')
+      .leftJoinAndSelect('board.artist', 'artist')
+      .leftJoinAndSelect('board.boardAddress', 'boardAddress')
+      .leftJoinAndSelect('board.boardImageURL', 'boardImageURL');
+
+    if (searchBoardInput) {
+      find
+        .where('category.id IN (:...category)', {
+          category: searchBoardInput.category,
+        })
+        .andWhere('boardAddress.address_district = :district', {
+          district: searchBoardInput.district,
+        });
+    }
+
+    if (searchBoardInput.category && !searchBoardInput.district) {
+      find.where('category.id IN (:...category)', {
+        category: searchBoardInput.category,
+      });
+    }
+
+    if (searchBoardInput.district && !searchBoardInput.category) {
+      find.where('boardAddress.address_district = :district', {
+        district: searchBoardInput.district,
+      });
+    }
+
+    const result = await find
+      .orderBy('board.createAt', 'DESC')
+      .take(12)
+      .skip(searchBoardInput.page ? (searchBoardInput.page - 1) * 12 : 0)
+      .getMany();
+
+    for (let i = 0; i < result.flat().length; i++) {
+      if (
+        result.flat()[i].start_time < time &&
+        result.flat()[i].end_time > time
+      ) {
+        result.flat()[i].isShowTime = true;
+      } else if (result.flat()[i].end_time < time) {
+        result.flat()[i].isShowTime = false;
+      } else if (result.flat()[i].start_time > time) {
+        result.flat()[i].isShowTime = null;
+      }
+    }
+
+    return result.flat();
+    // if (!searchBoardInput) {
+    //   const value = await this.boardRepository.find({
+    //     relations: ['category', 'artist', 'boardAddress', 'boardImageURL'],
+    //   });
+    //   const now = new Date();
+    //   for (let i = 0; i < value.length; i++) {
+    //     if (value[i].start_time < now && value[i].end_time > now) {
+    //       await this.boardRepository.save({
+    //         ...value[i],
+    //         id: value[i].id,
+    //         isShowTime: true,
+    //       });
+    //     } else {
+    //       await this.boardRepository.save({
+    //         ...value[i],
+    //         id: value[i].id,
+    //         isShowTime: false,
+    //       });
+    //     }
+    //   }
+    //   const page = 1;
+    //   const result = this.paging({ value, page });
+    //   if (!result) return [];
+    //   return result;
+    // }
+    // const { page, category, district } = searchBoardInput;
+    // if (category && district) {
+    //   const value = await this.boardRepository.find({
+    //     where: {
+    //       category: {
+    //         id: In(category),
+    //       },
+    //       boardAddress: {
+    //         address_district: district,
+    //       },
+    //     },
+    //     relations: ['category', 'artist', 'boardAddress', 'boardImageURL'],
+    //   });
+    //   const now = new Date();
+    //   for (let i = 0; i < value.length; i++) {
+    //     if (value[i].start_time < now && value[i].end_time > now) {
+    //       await this.boardRepository.save({
+    //         ...value[i],
+    //         id: value[i].id,
+    //         isShowTime: true,
+    //       });
+    //     } else {
+    //       await this.boardRepository.save({
+    //         ...value[i],
+    //         id: value[i].id,
+    //         isShowTime: false,
+    //       });
+    //     }
+    //   }
+    //   const result = this.paging({ value, page });
+    //   if (!result) return [];
+    //   return result;
+    // }
+    // if (!category) {
+    //   const value = await this.boardRepository.find({
+    //     where: {
+    //       boardAddress: {
+    //         address_district: district,
+    //       },
+    //     },
+    //     relations: ['category', 'artist', 'boardAddress', 'boardImageURL'],
+    //   });
+    //   const now = new Date();
+    //   for (let i = 0; i < value.length; i++) {
+    //     if (value[i].start_time < now && value[i].end_time > now) {
+    //       await this.boardRepository.save({
+    //         ...value[i],
+    //         id: value[i].id,
+    //         isShowTime: true,
+    //       });
+    //     } else {
+    //       await this.boardRepository.save({
+    //         ...value[i],
+    //         id: value[i].id,
+    //         isShowTime: false,
+    //       });
+    //     }
+    //   }
+    //   const result = this.paging({ value, page });
+    //   if (!result) return [];
+    //   return result;
+    // }
+    // if (!district) {
+    //   const value = await this.boardRepository.find({
+    //     where: {
+    //       category: {
+    //         id: In(category),
+    //       },
+    //     },
+    //     relations: ['category', 'artist', 'boardAddress', 'boardImageURL'],
+    //   });
+    //   const now = new Date();
+    //   for (let i = 0; i < value.length; i++) {
+    //     if (value[i].start_time < now && value[i].end_time > now) {
+    //       await this.boardRepository.save({
+    //         ...value[i],
+    //         id: value[i].id,
+    //         isShowTime: true,
+    //       });
+    //     } else {
+    //       await this.boardRepository.save({
+    //         ...value[i],
+    //         id: value[i].id,
+    //         isShowTime: false,
+    //       });
+    //     }
+    //   }
+    //   const result = this.paging({ value, page });
+    //   if (!result) return [];
+    //   return result;
+    // }
+    // if (!category && !district) {
+    //   const value = await this.boardRepository.find();
+    //   const result = this.paging({ value, page });
+    //   if (!result) return [];
+    //   return result;
+    // }
+  }
+
+  // 기준값 null false것중에 creatat으로 정렬
+  // 최근 게시물 3개 보여주기 (시간을 지금 시간 전으로할지? 아니면 총 게시물에서 start 시간으로 정할지 물어보기)
+  async findRecent({ artistId, time }) {
+    const result = await this.boardRepository
+      .createQueryBuilder('board')
+      .leftJoinAndSelect('board.category', 'category')
+      .leftJoinAndSelect('board.artist', 'artist')
+      .leftJoinAndSelect('board.boardAddress', 'boardAddress')
+      .leftJoinAndSelect('board.boardImageURL', 'boardImageURL')
+      .where('artist.id = :artistId', { artistId })
+      .andWhere('board.end_time < :time', { time })
+      .orderBy('board.createAt', 'DESC')
+      .take(3)
+      .getMany();
+
+    return result;
+    // const recent = await this.boardRepository.find({
+    //   where: {
+    //     artist: {
+    //       id: artistId,
+    //     },
+    //   },
+    //   relations: ['artist', 'boardImageURL', 'boardAddress', 'category'],
+    // });
+    // recent.sort(function (a, b) {
+    //   return b.end_time < a.end_time ? -1 : b.end_time > a.end_time ? 1 : 0;
+    // });
+    // const temp = [];
+    // for (let i = 0; i < 3; i++) {
+    //   if (!recent[i]) break;
+    //   temp.push(recent[i]);
+    // }
+    // return temp;
   }
 
   async create({ context, createBoardInput }) {
@@ -69,8 +301,8 @@ export class BoardsService {
         '잘못된 카테고리 혹은 카테고리가 없습니다.',
       );
 
-    const start = new Date(createBoardInput.start_time);
-    const end = new Date(createBoardInput.end_time);
+    // const start = new Date(createBoardInput.start_time);
+    // const end = new Date(createBoardInput.end_time);
 
     const city = boardAddressInput.address.split(' ')[0];
     const district = `${boardAddressInput.address.split(' ')[0]} ${
@@ -89,8 +321,6 @@ export class BoardsService {
       category: boardCategory,
       artist: auth.artist,
       boardAddress: boardAddress,
-      start_time: start,
-      end_time: end,
     });
 
     const temp = [];
@@ -108,229 +338,7 @@ export class BoardsService {
     return result;
   }
 
-  async findAll() {
-    return await this.boardRepository.find({
-      relations: ['category', 'artist', 'boardAddress', 'boardImageURL'],
-    });
-  }
-
-  async findSearch({ searchBoardInput }) {
-    if (!searchBoardInput) {
-      const value = await this.boardRepository.find({
-        relations: ['category', 'artist', 'boardAddress', 'boardImageURL'],
-      });
-
-      const now = new Date();
-      for (let i = 0; i < value.length; i++) {
-        if (value[i].start_time < now && value[i].end_time > now) {
-          await this.boardRepository.save({
-            ...value[i],
-            id: value[i].id,
-            isShowTime: true,
-          });
-        } else {
-          await this.boardRepository.save({
-            ...value[i],
-            id: value[i].id,
-            isShowTime: false,
-          });
-        }
-      }
-      const page = 1;
-      const result = this.paging({ value, page });
-      if (!result) return [];
-      return result;
-    }
-    const { page, category, district } = searchBoardInput;
-    if (category && district) {
-      const value = await this.boardRepository.find({
-        where: {
-          category: {
-            id: In(category),
-          },
-          boardAddress: {
-            address_district: district,
-          },
-        },
-        relations: ['category', 'artist', 'boardAddress', 'boardImageURL'],
-      });
-
-      const now = new Date();
-      for (let i = 0; i < value.length; i++) {
-        if (value[i].start_time < now && value[i].end_time > now) {
-          await this.boardRepository.save({
-            ...value[i],
-            id: value[i].id,
-            isShowTime: true,
-          });
-        } else {
-          await this.boardRepository.save({
-            ...value[i],
-            id: value[i].id,
-            isShowTime: false,
-          });
-        }
-      }
-
-      const result = this.paging({ value, page });
-      if (!result) return [];
-      return result;
-    }
-
-    if (!category) {
-      const value = await this.boardRepository.find({
-        where: {
-          boardAddress: {
-            address_district: district,
-          },
-        },
-        relations: ['category', 'artist', 'boardAddress', 'boardImageURL'],
-      });
-
-      const now = new Date();
-      for (let i = 0; i < value.length; i++) {
-        if (value[i].start_time < now && value[i].end_time > now) {
-          await this.boardRepository.save({
-            ...value[i],
-            id: value[i].id,
-            isShowTime: true,
-          });
-        } else {
-          await this.boardRepository.save({
-            ...value[i],
-            id: value[i].id,
-            isShowTime: false,
-          });
-        }
-      }
-      const result = this.paging({ value, page });
-      if (!result) return [];
-      return result;
-    }
-
-    if (!district) {
-      const value = await this.boardRepository.find({
-        where: {
-          category: {
-            id: In(category),
-          },
-        },
-        relations: ['category', 'artist', 'boardAddress', 'boardImageURL'],
-      });
-
-      const now = new Date();
-      for (let i = 0; i < value.length; i++) {
-        if (value[i].start_time < now && value[i].end_time > now) {
-          await this.boardRepository.save({
-            ...value[i],
-            id: value[i].id,
-            isShowTime: true,
-          });
-        } else {
-          await this.boardRepository.save({
-            ...value[i],
-            id: value[i].id,
-            isShowTime: false,
-          });
-        }
-      }
-      const result = this.paging({ value, page });
-      if (!result) return [];
-      return result;
-    }
-
-    if (!category && !district) {
-      const value = await this.boardRepository.find();
-
-      const result = this.paging({ value, page });
-      if (!result) return [];
-      return result;
-    }
-  }
-
-  async findRecent({ artistId }) {
-    const recent = await this.boardRepository.find({
-      where: {
-        artist: {
-          id: artistId,
-        },
-      },
-      relations: ['artist', 'boardImageURL', 'boardAddress', 'category'],
-    });
-
-    recent.sort(function (a, b) {
-      return b.end_time < a.end_time ? -1 : b.end_time > a.end_time ? 1 : 0;
-    });
-
-    const temp = [];
-    for (let i = 0; i < 3; i++) {
-      if (!recent[i]) break;
-      temp.push(recent[i]);
-    }
-    return temp;
-  }
-
-  // async findCity({ city }) {
-  //   const result = await this.boardRepository.find({
-  //     where: {
-  //       boardAddress: {
-  //         address_city: city,
-  //       },
-  //     },
-  //     relations: ['category', 'artist', 'boardAddress', 'boardImages'],
-  //   });
-  //   return result;
-  // }
-
-  // async findDistrict({ district }) {
-  //   const result = await this.boardRepository.find({
-  //     where: {
-  //       boardAddress: {
-  //         address_district: district,
-  //       },
-  //     },
-  //     relations: ['category', 'artist', 'boardAddress', 'boardImages'],
-  //   });
-  //   return result;
-  // }
-
-  // async findCategory({ category }) {
-  //   const result = await this.boardRepository.find({
-  //     where: {
-  //       category: {
-  //         name: In(category),
-  //       },
-  //     },
-  //     relations: ['category', 'artist', 'boardAddress', 'boardImages'],
-  //   });
-
-  //   if (result.length === 0) {
-  //     throw new UnprocessableEntityException('조회된 내역이없습니다.');
-  //   }
-  //   return result;
-  // }
-
-  async findOne({ boardId }) {
-    const result = await this.boardRepository.findOne({
-      where: {
-        id: boardId,
-      },
-      relations: [
-        'category',
-        'artist',
-        'boardAddress',
-        'comments',
-        'boardImageURL',
-      ],
-    });
-
-    if (!result) {
-      throw new UnprocessableEntityException('잘못된 조회입니다.');
-    }
-
-    return result;
-  }
-
+  // 이미지 댓글 지우고 cascade 하고 보드 지우기
   async delete({ boardId }) {
     await this.boardImageRepository.delete({
       boards: {
@@ -356,7 +364,6 @@ export class BoardsService {
     await this.boardAddressRepository.delete({
       id: board.boardAddress.id,
     });
-
     return result.affected ? true : false;
   }
 

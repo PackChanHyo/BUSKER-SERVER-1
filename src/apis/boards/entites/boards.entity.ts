@@ -31,16 +31,16 @@ export class Boards {
   @Field(() => String)
   contents: string;
 
-  @Column()
-  @Field(() => Date)
+  @Column({ nullable: true })
+  @Field(() => Date, { nullable: true })
   start_time: Date;
 
-  @Column()
-  @Field(() => Date)
+  @Column({ nullable: true })
+  @Field(() => Date, { nullable: true })
   end_time: Date;
 
-  @Column({ default: false })
-  @Field(() => Boolean)
+  @Column({ nullable: true })
+  @Field(() => Boolean, { nullable: true })
   isShowTime: boolean;
 
   @CreateDateColumn()
