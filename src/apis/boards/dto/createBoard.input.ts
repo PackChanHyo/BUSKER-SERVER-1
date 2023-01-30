@@ -16,7 +16,7 @@ export class CreateBoardInput {
   end_time: Date;
 
   @Field(() => String)
-  category: string;
+  categoryId: string;
 
   @Field(() => BoardAddressInput)
   boardAddressInput: BoardAddressInput;

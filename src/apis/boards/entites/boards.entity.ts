@@ -1,3 +1,4 @@
+import { All } from '@nestjs/common';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Artist } from 'src/apis/artists/entity/artist.entity';
 import { BoardAddress } from 'src/apis/boardAddress/entity/boardAddress.entity';
@@ -14,6 +15,7 @@ import {
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
@@ -47,6 +49,10 @@ export class Boards {
   @Field(() => Date)
   createAt: Date;
 
+  @UpdateDateColumn()
+  @Field(() => Date)
+  updatedAt: Date;
+
   @ManyToOne(() => Category)
   @Field(() => Category)
   category: Category;
@@ -72,12 +78,16 @@ export class Boards {
   // boardImageURL: string;
 
   @JoinColumn()
-  @OneToMany(() => BoardImages, (boardImageURL) => boardImageURL.boards)
+  @OneToMany(() => BoardImages, (boardImageURL) => boardImageURL.boards, {
+    cascade: ['remove', 'update'],
+  })
   @Field(() => [BoardImages])
   boardImageURL: [BoardImages];
 
   @JoinColumn()
-  @OneToMany(() => Comments, (comments) => comments.board)
+  @OneToMany(() => Comments, (comments) => comments.board, {
+    cascade: ['remove', 'update'],
+  })
   @Field(() => [Comments])
   comments: Comments[];
 }

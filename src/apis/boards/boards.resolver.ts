@@ -18,7 +18,7 @@ export class BoardsResolver {
   @UseGuards(GqlAuthAccessGuard)
   @Query(() => [Boards])
   async fetchBoards(
-    @Args('page') page: string, //
+    @Args('page') page: number, //
   ) {
     return await this.boardsService.findAll({ page });
   }
@@ -89,7 +89,7 @@ export class BoardsResolver {
   @Roles(RoleType.ARTIST)
   @UseGuards(GqlAuthAccessGuard, RolesGuard)
   @Mutation(() => Boolean)
-  deleteBoard(@Args('boardId') boardId: string) {
-    return this.boardsService.delete({ boardId });
+  async deleteBoard(@Args('boardId') boardId: string) {
+    return await this.boardsService.delete({ boardId });
   }
 }
