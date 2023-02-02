@@ -3,9 +3,6 @@ import { BoardAddressInput } from 'src/apis/boardAddress/dto/createboardAddress.
 
 @InputType()
 export class CreateBoardInput {
-  // @Field(() => String)
-  // title: string;
-
   @Field(() => String)
   contents: string;
 

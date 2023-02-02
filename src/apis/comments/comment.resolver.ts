@@ -10,26 +10,26 @@ export class CommentsResolver {
   constructor(private readonly commentService: CommentsService) {}
 
   @UseGuards(GqlAuthAccessGuard)
+  @Query(() => [Comments])
+  async fetchComments(@Args('boardId') boardId: string) {
+    return await this.commentService.findBycommentAll({ boardId });
+  }
+
+  @UseGuards(GqlAuthAccessGuard)
+  @Query(() => Comments)
+  async fetchByComment(
+    @Args('commentId') commentId: string, //
+  ) {
+    return await this.commentService.findByComment({ commentId });
+  }
+
+  @UseGuards(GqlAuthAccessGuard)
   @Mutation(() => Comments)
   async createComment(
     @Args('createCommentInput') createCommentInput: CreateCommentInput, //
     @Context() context: any,
   ) {
     return await this.commentService.create({ context, createCommentInput });
-  }
-
-  @Query(() => [Comments])
-  fetchComment(@Args('boardId') boardId: string) {
-    return this.commentService.findOne({ boardId });
-  }
-
-  @UseGuards(GqlAuthAccessGuard)
-  @Mutation(() => Boolean)
-  async deleteComment(
-    @Args('commentId') commentId: string,
-    @Context() context: any,
-  ) {
-    return await this.commentService.delete({ context, commentId });
   }
 
   @UseGuards(GqlAuthAccessGuard)
@@ -39,6 +39,15 @@ export class CommentsResolver {
     @Args('content') content: string,
     @Context() context: any,
   ) {
-    return this.commentService.update({ context, commentId, content });
+    return await this.commentService.update({ context, commentId, content });
+  }
+
+  @UseGuards(GqlAuthAccessGuard)
+  @Mutation(() => Boolean)
+  async deleteComment(
+    @Args('commentId') commentId: string,
+    @Context() context: any,
+  ) {
+    return await this.commentService.delete({ context, commentId });
   }
 }

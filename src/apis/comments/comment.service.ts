@@ -16,49 +16,42 @@ export class CommentsService {
     private readonly userRepository: Repository<User>,
   ) {}
 
+  async findBycommentAll({ boardId }) {
+    return await this.commentRepository
+      .createQueryBuilder('comment')
+      .leftJoinAndSelect('comment.user', 'user')
+      .leftJoinAndSelect('comment.board', 'board')
+      .where('board.id = :boardId', { boardId })
+      .orderBy('comment.createAt', 'DESC')
+      .getMany();
+  }
+
+  async findByComment({ commentId }) {
+    return await this.commentRepository.findOne({
+      where: { id: commentId },
+      relations: ['user', 'board'],
+    });
+  }
+
   async create({ context, createCommentInput }) {
     const board = await this.boardsRepository.findOne({
       where: {
         id: createCommentInput.boardId,
       },
+      relations: ['artist', 'boardImageURL'],
     });
+    const user = await this.userRepository.findOne({
+      where: { id: context.req.user.id },
+      relations: ['userImageURL'],
+    });
+
     const result = await this.commentRepository.save({
       ...createCommentInput,
-      user: context.req.user,
+      user,
       board,
     });
 
     return result;
-  }
-
-  async findOne({ boardId }) {
-    const result = await this.commentRepository.find({
-      where: {
-        board: {
-          id: boardId,
-        },
-      },
-      relations: ['user', 'board'],
-    });
-
-    return result.sort(function (a, b) {
-      return b.createAt < a.createAt ? -1 : b.createAt > a.createAt ? 1 : 0;
-    });
-  }
-
-  async delete({ context, commentId }) {
-    const comment = await this.commentRepository.findOne({
-      where: {
-        id: commentId,
-      },
-      relations: ['user'],
-    });
-
-    if (comment.user.id !== context.req.user.id) {
-      throw new UnprocessableEntityException('내가 쓴 댓글만 삭제 가능합니다.');
-    }
-    const result = await this.commentRepository.delete({ id: commentId });
-    return result.affected ? true : false;
   }
 
   async update({ context, commentId, content }) {
@@ -79,5 +72,20 @@ export class CommentsService {
     });
 
     return result;
+  }
+
+  async delete({ context, commentId }) {
+    const comment = await this.commentRepository.findOne({
+      where: {
+        id: commentId,
+      },
+      relations: ['user'],
+    });
+
+    if (comment.user.id !== context.req.user.id) {
+      throw new UnprocessableEntityException('내가 쓴 댓글만 삭제 가능합니다.');
+    }
+    const result = await this.commentRepository.delete({ id: commentId });
+    return result.affected ? true : false;
   }
 }

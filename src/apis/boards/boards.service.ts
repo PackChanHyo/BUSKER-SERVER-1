@@ -156,13 +156,8 @@ export class BoardsService {
         '잘못된 카테고리 혹은 카테고리가 없습니다.',
       );
 
-    // const start = new Date(createBoardInput.start_time);
-    // const end = new Date(createBoardInput.end_time);
-
     const city = boardAddressInput.address.split(' ')[0];
-    const district = `${boardAddressInput.address.split(' ')[0]} ${
-      boardAddressInput.address.split(' ')[1]
-    }`;
+    const district = boardAddressInput.address.split(' ')[1];
 
     const boardAddress = await this.boardAddressRepository.save({
       address_city: city,
@@ -238,9 +233,7 @@ export class BoardsService {
     if (updateBoardInput.boardAddressInput) {
       const city = updateBoardInput.boardAddressInput.address.split(' ')[0];
 
-      const district = `${
-        updateBoardInput.boardAddressInput.address.split(' ')[0]
-      } ${updateBoardInput.boardAddressInput.address.split(' ')[1]}`;
+      const district = updateBoardInput.boardAddressInput.address.split(' ')[1];
 
       const boardAddress = await this.boardAddressRepository.save({
         id: myBoard.boardAddress.id,

@@ -66,17 +66,6 @@ export class Boards {
   @Field(() => BoardAddress)
   boardAddress: BoardAddress;
 
-  // @JoinColumn()
-  // @OneToMany(() => BoardImages, (boardImages) => boardImages.boards, {
-  //   nullable: true,
-  // })
-  // @Field(() => [BoardImages])
-  // boardImages: BoardImages[];
-
-  // @Column()
-  // @Field(() => String)
-  // boardImageURL: string;
-
   @JoinColumn()
   @OneToMany(() => BoardImages, (boardImageURL) => boardImageURL.boards, {
     cascade: ['remove', 'update'],

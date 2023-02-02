@@ -1,4 +1,4 @@
-import { InputType, OmitType, PartialType } from '@nestjs/graphql';
+import { InputType, PartialType } from '@nestjs/graphql';
 import { CreateBoardInput } from './createBoard.input';
 
 @InputType()
