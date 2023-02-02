@@ -34,7 +34,7 @@ export class AuthService {
   setRefreshToken({ user, res, req }) {
     const refreshToken = this.jwtService.sign(
       { email: user.email, sub: user.id },
-      { secret: 'myRefreshKey', expiresIn: '2w' },
+      { secret: process.env.REFRESH_TOKEN_KEY, expiresIn: '2w' },
     );
     res.setHeader('Set-Cookie', `refreshToken=${refreshToken}; path=/;`);
     // const originList = ['http://localhost:3000', 'https://busker.shop'];
@@ -69,7 +69,7 @@ export class AuthService {
         sub: user.id,
         role: role.authority,
       },
-      { secret: process.env.ACCESS_SECRET, expiresIn: '1h' },
+      { secret: process.env.ACCESS_TOKEN_KEY, expiresIn: '1h' },
     );
   }
 

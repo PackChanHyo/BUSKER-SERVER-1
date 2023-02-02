@@ -11,5 +11,19 @@ services:
     #   - ./src:/myfolder/src
     ports:
       - 3000:3000
-    # env_file:
-    #   - ./.env.prod
+    env_file:
+      - ./.env.prod
+
+  my-database:
+    platform: linux/x86_64
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: 'busker'
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports:
+      - 3306:3306
+
+  team-redis:
+    image: redis:latest
+    ports:
+      - 6379:6379    

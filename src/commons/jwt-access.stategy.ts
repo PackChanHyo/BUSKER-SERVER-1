@@ -10,7 +10,7 @@ export class JwtAccessStrategy extends PassportStrategy(Strategy, 'access') {
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: process.env.ACCESS_SECRET,
+      secretOrKey: process.env.ACCESS_TOKEN_KEY,
       passReqToCallback: true,
     });
   }
@@ -22,7 +22,7 @@ export class JwtAccessStrategy extends PassportStrategy(Strategy, 'access') {
     if (isExpire) {
       throw new UnauthorizedException('Access Token Expired');
     }
-    console.log('payload.role', payload.role);
+    // console.log('payload.role', payload.role);
     return { email: payload.email, id: payload.sub, role: payload.role };
   }
 }
