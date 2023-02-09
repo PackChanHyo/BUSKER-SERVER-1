@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   my-backend:
-    image: asia.gcr.io/busker-368211/my-backend:0.1
+    image:
     platform: linux/x86_64
     build:
       context: .
@@ -20,7 +20,6 @@ services:
     environment:
       MYSQL_DATABASE: 'busker'
       MYSQL_ROOT_PASSWORD: 'root!'
-      MYSQL_ROOT_PASSWORD: 'root'
     ports:
       - 3306:3306
 
