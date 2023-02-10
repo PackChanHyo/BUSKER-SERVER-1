@@ -16,8 +16,6 @@ export class JwtFacebookStrategy extends PassportStrategy(
   }
 
   validate(accessToken, refreshToken, public_profile) {
-    console.log(public_profile);
-    console.log(public_profile.emails);
     return {
       email: public_profile.emails[0].value,
       password: 'Qwer1234!!',
