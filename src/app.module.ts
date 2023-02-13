@@ -41,7 +41,11 @@ import { CityModule } from './apis/city/city.module';
       autoSchemaFile: './common/graphql/schema.gql',
       context: ({ req, res }) => ({ req, res }),
       cors: {
-        origin: ['http://localhost:3000', 'https://busker.shop'],
+        origin: [
+          'http://localhost:3000',
+          'https://busker.shop',
+          'https://port-0-busker-client-4fuvwk25lcrlelfh.gksl2.cloudtype.app/',
+        ],
         credentials: true,
         exposedHeaders: ['Set-Cookie', 'Cookie'],
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],

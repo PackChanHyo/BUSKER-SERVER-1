@@ -6,7 +6,11 @@ import { graphqlUploadExpress } from 'graphql-upload';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
   app.enableCors({
-    origin: ['https://busker.shop', 'http://localhost:3000'],
+    origin: [
+      'https://busker.shop',
+      'http://localhost:3000',
+      'https://port-0-busker-client-4fuvwk25lcrlelfh.gksl2.cloudtype.app/',
+    ],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: [
       'Access-Control-Allow-Headers',

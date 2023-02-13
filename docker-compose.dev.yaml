@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   my-backend:
-    image:
+    image: asia.gcr.io/buskerad/busker:0.6
     platform: linux/x86_64
     build:
       context: .
