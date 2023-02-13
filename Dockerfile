@@ -9,4 +9,4 @@ RUN yarn install --production
 
 COPY . /busker/
 RUN yarn build
-CMD [“yarn”, “start”]
+CMD yarn start:dev
