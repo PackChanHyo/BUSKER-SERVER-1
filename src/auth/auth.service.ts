@@ -37,7 +37,11 @@ export class AuthService {
       { secret: process.env.REFRESH_TOKEN_KEY, expiresIn: '2w' },
     );
     // res.setHeader('Set-Cookie', `refreshToken=${refreshToken}; path=/;`);
-    const originList = ['http://localhost:3000', 'https://busker.shop'];
+    const originList = [
+      'http://localhost:3000',
+      'https://busker.shop',
+      'https://port-0-busker-client-4fuvwk25lcrlelfh.gksl2.cloudtype.app/',
+    ];
     const origin = req.headers.origin;
     if (originList.includes(origin)) {
       res.setHeader('Access-Control-Allow-Origin', origin); //프론트와 연결
@@ -134,7 +138,11 @@ export class AuthService {
         },
       );
       // 쿠키 지움
-      const originList = ['http://localhost:3000', 'https://busker.shop'];
+      const originList = [
+        'http://localhost:3000',
+        'https://busker.shop',
+        'https://port-0-busker-client-4fuvwk25lcrlelfh.gksl2.cloudtype.app/',
+      ];
       const origin = req.headers.origin;
       if (originList.includes(origin)) {
         res.setHeader('Access-Control-Allow-Origin', origin); //프론트와 연결
@@ -178,6 +186,8 @@ export class AuthService {
 
     // 3. 회원가입이 되어있다면? 로그인(refreshToken, accessToken 만들어서 프론트엔드에 주기)
     this.setRefreshToken({ user, res, req });
-    res.redirect('http://localhost:3000');
+    res.redirect(
+      'https://port-0-busker-client-4fuvwk25lcrlelfh.gksl2.cloudtype.app/',
+    );
   }
 }
