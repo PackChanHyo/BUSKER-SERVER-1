@@ -50,7 +50,13 @@ export class AuthService {
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader(
       'Access-Control-Allow-Methods',
-      'GET, HEAD, POST, OPTIONS, PUT',
+      'GET',
+      'POST',
+      'PUT',
+      'PATCH',
+      'DELETE',
+      'OPTIONS',
+      'HEAD',
     ); //method 지정
     res.setHeader(
       'Access-Control-Allow-Headers',
@@ -151,7 +157,13 @@ export class AuthService {
       res.setHeader('Access-Control-Allow-Credentials', 'true');
       res.setHeader(
         'Access-Control-Allow-Methods',
-        'GET, HEAD, POST, OPTIONS, PUT',
+        'GET',
+        'POST',
+        'PUT',
+        'PATCH',
+        'DELETE',
+        'OPTIONS',
+        'HEAD',
       );
       res.setHeader(
         'Access-Control-Allow-Headers',

@@ -11,7 +11,7 @@ async function bootstrap() {
       'http://localhost:3000',
       'https://port-0-busker-client-4fuvwk25lcrlelfh.gksl2.cloudtype.app/',
     ],
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
     allowedHeaders: [
       'Access-Control-Allow-Headers',
       'Authorization',
