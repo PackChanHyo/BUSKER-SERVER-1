@@ -50,13 +50,7 @@ export class AuthService {
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader(
       'Access-Control-Allow-Methods',
-      'GET',
-      'POST',
-      'PUT',
-      'PATCH',
-      'DELETE',
-      'OPTIONS',
-      'HEAD',
+      'GET, HEAD, POST, OPTIONS, PUT, PATCH, DELETE',
     ); //method 지정
     res.setHeader(
       'Access-Control-Allow-Headers',
@@ -113,7 +107,7 @@ export class AuthService {
         req: context.req,
       });
       //
-      return this.getAccessToken({ user });
+      return await this.getAccessToken({ user });
     }
   }
 
@@ -157,13 +151,7 @@ export class AuthService {
       res.setHeader('Access-Control-Allow-Credentials', 'true');
       res.setHeader(
         'Access-Control-Allow-Methods',
-        'GET',
-        'POST',
-        'PUT',
-        'PATCH',
-        'DELETE',
-        'OPTIONS',
-        'HEAD',
+        'GET, HEAD, POST, OPTIONS, PUT, PATCH, DELETE',
       );
       res.setHeader(
         'Access-Control-Allow-Headers',

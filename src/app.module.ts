@@ -57,6 +57,8 @@ import { CityModule } from './apis/city/city.module';
           'Accept',
         ],
       },
+      playground: true,
+      introspection: true,
     }),
     MailerModule.forRoot({
       transport: {

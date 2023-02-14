@@ -2,25 +2,22 @@ import { Get, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { graphqlUploadExpress } from 'graphql-upload';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { json, urlencoded } from 'express';
+import { join } from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.use(json({ limit: '10mb' }));
+  app.use(urlencoded({ limit: '10mb', extended: true }));
+  app.useStaticAssets(join(__dirname, '..', 'static'));
   app.enableCors({
     origin: [
       'https://busker.shop',
       'http://localhost:3000',
       'https://port-0-busker-client-4fuvwk25lcrlelfh.gksl2.cloudtype.app/',
     ],
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
-    allowedHeaders: [
-      'Access-Control-Allow-Headers',
-      'Authorization',
-      'X-Requested-With',
-      'Content-Type',
-      'Accept',
-    ],
     credentials: true,
-    exposedHeaders: ['Authorization', 'Set-Cookie', 'Cookie'],
   });
   app.useGlobalPipes(new ValidationPipe());
   app.use(graphqlUploadExpress());
