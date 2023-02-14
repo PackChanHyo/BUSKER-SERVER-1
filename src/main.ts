@@ -15,7 +15,7 @@ async function bootstrap() {
     origin: [
       'https://busker.shop',
       'http://localhost:3000',
-      'https://port-0-busker-client-4fuvwk25lcrlelfh.gksl2.cloudtype.app/',
+      'https://port-0-busker-client-4fuvwk25lcrlelfh.gksl2.cloudtype.app',
     ],
     credentials: true,
   });

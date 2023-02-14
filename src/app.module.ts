@@ -44,7 +44,7 @@ import { CityModule } from './apis/city/city.module';
         origin: [
           'http://localhost:3000',
           'https://busker.shop',
-          'https://port-0-busker-client-4fuvwk25lcrlelfh.gksl2.cloudtype.app/',
+          'https://port-0-busker-client-4fuvwk25lcrlelfh.gksl2.cloudtype.app',
         ],
         credentials: true,
         exposedHeaders: ['Set-Cookie', 'Cookie'],
