@@ -30,15 +30,30 @@ export class BoardsService {
   ) {}
 
   async findAll({ page }) {
-    return await this.boardRepository
+    const time = new Date();
+    time.setHours(time.getHours() + 9);
+
+    const result = await this.boardRepository
       .createQueryBuilder('board')
       .leftJoinAndSelect('board.category', 'category')
       .leftJoinAndSelect('board.artist', 'artist')
       .leftJoinAndSelect('board.boardAddress', 'boardAddress')
       .leftJoinAndSelect('board.boardImageURL', 'boardImageURL')
+      .orderBy('board.createAt', 'DESC')
       .take(12)
       .skip(page ? (page - 1) * 12 : 0)
       .getMany();
+
+    for (let i = 0; i < result.length; i++) {
+      if (result[i].start_time < time && result[i].end_time > time) {
+        result[i].isShowTime = true;
+      } else if (result[i].end_time < time) {
+        result[i].isShowTime = false;
+      } else if (result[i].start_time > time) {
+        result[i].isShowTime = null;
+      }
+    }
+    return result;
   }
 
   async findOne({ boardId }) {
@@ -64,7 +79,9 @@ export class BoardsService {
 
   // 장르별, 카테고리별 지역별  api를 따로 만들거나 압축하기 (제안)
   // const 조건만 적고 if문 작성
-  async findSearch({ searchBoardInput, time }) {
+  async findSearch({ searchBoardInput }) {
+    const time = new Date();
+    time.setHours(time.getHours() + 9);
     const find = this.boardRepository
       .createQueryBuilder('board')
       .leftJoinAndSelect('board.category', 'category')
@@ -118,7 +135,9 @@ export class BoardsService {
 
   // 기준값 null false것중에 creatat으로 정렬
   // 최근 게시물 3개 보여주기 (시간을 지금 시간 전으로할지? 아니면 총 게시물에서 start 시간으로 정할지 물어보기)
-  async findRecent({ artistId, time }) {
+  async findRecent({ artistId }) {
+    const time = new Date();
+    time.setHours(time.getHours() + 9);
     const result = await this.boardRepository
       .createQueryBuilder('board')
       .leftJoinAndSelect('board.category', 'category')
@@ -126,11 +145,19 @@ export class BoardsService {
       .leftJoinAndSelect('board.boardAddress', 'boardAddress')
       .leftJoinAndSelect('board.boardImageURL', 'boardImageURL')
       .where('artist.id = :artistId', { artistId })
-      .andWhere('board.end_time < :time', { time })
       .orderBy('board.createAt', 'DESC')
       .take(3)
       .getMany();
 
+    for (let i = 0; i < result.length; i++) {
+      if (result[i].start_time < time && result[i].end_time > time) {
+        result[i].isShowTime = true;
+      } else if (result[i].end_time < time) {
+        result[i].isShowTime = false;
+      } else if (result[i].start_time > time) {
+        result[i].isShowTime = null;
+      }
+    }
     return result;
   }
 

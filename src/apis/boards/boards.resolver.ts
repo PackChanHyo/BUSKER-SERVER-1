@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Context, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { GqlAuthAccessGuard } from 'src/commons/gql-auth.guard';
 import { Roles } from 'src/commons/role/roles.decorator';
 import { RolesGuard } from 'src/commons/role/roles.guard';
@@ -18,7 +18,7 @@ export class BoardsResolver {
   @UseGuards(GqlAuthAccessGuard)
   @Query(() => [Boards])
   async fetchBoards(
-    @Args('page') page: number, //
+    @Args('page', { type: () => Int }) page: number, //
   ) {
     return await this.boardsService.findAll({ page });
   }
@@ -37,22 +37,17 @@ export class BoardsResolver {
   async fetchBoardsBySearch(
     @Args({ name: 'searchBoardInput', nullable: true })
     searchBoardInput: SearchBoardInput,
-    @Args('time') time: Date,
   ) {
     const result = await this.boardsService.findSearch({
       searchBoardInput,
-      time,
     });
     return result;
   }
 
   @UseGuards(GqlAuthAccessGuard)
   @Query(() => [Boards])
-  async fetchRecentBoards(
-    @Args('artistId') artistId: string,
-    @Args('time') time: Date,
-  ) {
-    return await this.boardsService.findRecent({ artistId, time });
+  async fetchRecentBoards(@Args('artistId') artistId: string) {
+    return await this.boardsService.findRecent({ artistId });
   }
 
   @Roles(RoleType.ARTIST)
