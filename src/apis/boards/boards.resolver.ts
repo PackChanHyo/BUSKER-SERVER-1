@@ -16,14 +16,6 @@ export class BoardsResolver {
   constructor(private readonly boardsService: BoardsService) {}
 
   @UseGuards(GqlAuthAccessGuard)
-  @Query(() => [Boards])
-  async fetchBoards(
-    @Args('page', { type: () => Int }) page: number, //
-  ) {
-    return await this.boardsService.findAll({ page });
-  }
-
-  @UseGuards(GqlAuthAccessGuard)
   @Query(() => Boards)
   async fetchBoard(
     @Args('boardId') boardId: string, //

@@ -10,7 +10,7 @@ export class CreateArtistInput {
   description: string;
 
   @IsUrl()
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   promotion_url: string;
 
   @Field(() => String)

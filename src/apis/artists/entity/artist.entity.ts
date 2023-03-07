@@ -26,8 +26,8 @@ export class Artist {
   @Field(() => String)
   description: string;
 
-  @Column({ type: 'varchar', length: 500 })
-  @Field(() => String)
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  @Field(() => String, { nullable: true })
   promotion_url: string;
 
   @OneToMany(() => LikeArtist, (likeArtist) => likeArtist.artist)

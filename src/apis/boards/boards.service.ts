@@ -29,33 +29,6 @@ export class BoardsService {
     private readonly commentRepository: Repository<Comments>,
   ) {}
 
-  async findAll({ page }) {
-    const time = new Date();
-    time.setHours(time.getHours() + 9);
-
-    const result = await this.boardRepository
-      .createQueryBuilder('board')
-      .leftJoinAndSelect('board.category', 'category')
-      .leftJoinAndSelect('board.artist', 'artist')
-      .leftJoinAndSelect('board.boardAddress', 'boardAddress')
-      .leftJoinAndSelect('board.boardImageURL', 'boardImageURL')
-      .orderBy('board.createAt', 'DESC')
-      .take(12)
-      .skip(page ? (page - 1) * 12 : 0)
-      .getMany();
-
-    for (let i = 0; i < result.length; i++) {
-      if (result[i].start_time < time && result[i].end_time > time) {
-        result[i].isShowTime = true;
-      } else if (result[i].end_time < time) {
-        result[i].isShowTime = false;
-      } else if (result[i].start_time > time) {
-        result[i].isShowTime = null;
-      }
-    }
-    return result;
-  }
-
   async findOne({ boardId }) {
     const result = await this.boardRepository.findOne({
       where: {
@@ -82,6 +55,7 @@ export class BoardsService {
   async findSearch({ searchBoardInput }) {
     const time = new Date();
     time.setHours(time.getHours() + 9);
+    const { category, district } = searchBoardInput;
     const find = this.boardRepository
       .createQueryBuilder('board')
       .leftJoinAndSelect('board.category', 'category')
@@ -89,25 +63,24 @@ export class BoardsService {
       .leftJoinAndSelect('board.boardAddress', 'boardAddress')
       .leftJoinAndSelect('board.boardImageURL', 'boardImageURL');
 
-    if (searchBoardInput) {
+    if (category && district) {
       find
         .where('category.id IN (:...category)', {
-          category: searchBoardInput.category,
+          category: category,
         })
         .andWhere('boardAddress.address_district = :district', {
-          district: searchBoardInput.district,
+          district: district,
         });
     }
-
-    if (searchBoardInput.category && !searchBoardInput.district) {
+    if (category && !district) {
       find.where('category.id IN (:...category)', {
-        category: searchBoardInput.category,
+        category: category,
       });
     }
 
-    if (searchBoardInput.district && !searchBoardInput.category) {
+    if (district && !category) {
       find.where('boardAddress.address_district = :district', {
-        district: searchBoardInput.district,
+        district: district,
       });
     }
 
