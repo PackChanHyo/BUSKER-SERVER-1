@@ -16,9 +16,9 @@ steps:
       [
         'set',
         'image',
-        'deployment/busker--backend',
-        'my-backend-sha256-1=asia.gcr.io/busker-368211/my-backend:8.8',
+        'deployment/busker',
+        'busker-sha256-1=asia.gcr.io/buskerad/busker:1.9',
       ]
     env:
       - CLOUDSDK_COMPUTE_ZONE=asia-northeast3
-      - CLOUDSDK_CONTAINER_CLUSTER=autopilot-cluster-2
+      - CLOUDSDK_CONTAINER_CLUSTER=autopilot-cluster-1

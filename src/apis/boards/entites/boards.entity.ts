@@ -53,8 +53,8 @@ export class Boards {
   @Field(() => Date)
   updatedAt: Date;
 
-  @ManyToOne(() => Category)
-  @Field(() => Category)
+  @ManyToOne(() => Category, { nullable: true })
+  @Field(() => Category, { nullable: true })
   category: Category;
 
   @ManyToOne(() => Artist)
