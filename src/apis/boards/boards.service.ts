@@ -52,10 +52,9 @@ export class BoardsService {
 
   // 장르별, 카테고리별 지역별  api를 따로 만들거나 압축하기 (제안)
   // const 조건만 적고 if문 작성
-  async findSearch({ searchBoardInput }) {
+  async findSearch({ page, categoryId, districtId }) {
     const time = new Date();
     time.setHours(time.getHours() + 9);
-    const { category, district } = searchBoardInput;
     const find = this.boardRepository
       .createQueryBuilder('board')
       .leftJoinAndSelect('board.category', 'category')
@@ -63,31 +62,31 @@ export class BoardsService {
       .leftJoinAndSelect('board.boardAddress', 'boardAddress')
       .leftJoinAndSelect('board.boardImageURL', 'boardImageURL');
 
-    if (category && district) {
+    if (categoryId && districtId) {
       find
         .where('category.id IN (:...category)', {
-          category: category,
+          category: categoryId,
         })
         .andWhere('boardAddress.address_district = :district', {
-          district: district,
+          district: districtId,
         });
     }
-    if (category && !district) {
+    if (categoryId && !districtId) {
       find.where('category.id IN (:...category)', {
-        category: category,
+        category: categoryId,
       });
     }
 
-    if (district && !category) {
+    if (districtId && !categoryId) {
       find.where('boardAddress.address_district = :district', {
-        district: district,
+        district: districtId,
       });
     }
 
     const result = await find
       .orderBy('board.createAt', 'DESC')
       .take(12)
-      .skip(searchBoardInput.page ? (searchBoardInput.page - 1) * 12 : 0)
+      .skip(page ? (page - 1) * 12 : 0)
       .getMany();
 
     for (let i = 0; i < result.flat().length; i++) {

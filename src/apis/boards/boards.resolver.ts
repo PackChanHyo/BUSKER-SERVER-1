@@ -7,7 +7,6 @@ import { RoleType } from 'src/commons/role/type/role-type';
 
 import { BoardsService } from './boards.service';
 import { CreateBoardInput } from './dto/createBoard.input';
-import { SearchBoardInput } from './dto/searchBoard.inpust';
 import { UpdateBoardInput } from './dto/updateBoard.input';
 import { Boards } from './entites/boards.entity';
 
@@ -27,11 +26,16 @@ export class BoardsResolver {
   @UseGuards(GqlAuthAccessGuard)
   @Query(() => [Boards])
   async fetchBoardsBySearch(
-    @Args({ name: 'searchBoardInput', nullable: true })
-    searchBoardInput: SearchBoardInput,
+    @Args({ name: 'page', type: () => Int, nullable: true })
+    page: number,
+    @Args({ name: 'categoryId', type: () => [String], nullable: true })
+    categoryId: string[],
+    @Args({ name: 'districtId', nullable: true }) districtId: string,
   ) {
     const result = await this.boardsService.findSearch({
-      searchBoardInput,
+      page,
+      categoryId,
+      districtId,
     });
     return result;
   }
