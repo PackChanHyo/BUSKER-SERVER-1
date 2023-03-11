@@ -28,7 +28,7 @@ export class User {
   is_auth: boolean;
 
   @Column({ type: 'varchar', length: 200, generated: 'uuid' })
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   nickname: string;
 
   @Column({ type: 'int', default: 0 })
