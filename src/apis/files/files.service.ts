@@ -44,15 +44,14 @@ export class FilesService {
     }).bucket(bucket);
 
     // 스토리지에 파일 올리기
-    const result = new Promise(() => {
-      file
-        .createReadStream()
-        .pipe(storage.file(`${uuid}${file.filename}`).createWriteStream());
+    return await new Promise((resolve, reject) => {
+      file.createReadStream().pipe(
+        storage
+          .file(`${uuid}${file.filename}`)
+          .createWriteStream()
+          .on('finish', () => resolve(`${uuid}/${file.filename}`))
+          .on('error', () => reject('실패')),
+      );
     });
-    if (await result) {
-      return `${uuid}${file.filename}`;
-    } else {
-      throw new UnprocessableEntityException('실패');
-    }
   }
 }
