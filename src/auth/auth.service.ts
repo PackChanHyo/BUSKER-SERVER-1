@@ -36,30 +36,31 @@ export class AuthService {
       { email: user.email, sub: user.id },
       { secret: process.env.REFRESH_TOKEN_KEY, expiresIn: '2w' },
     );
-    // res.setHeader('Set-Cookie', `refreshToken=${refreshToken}; path=/;`);
-    const originList = [
-      'http://localhost:3000',
-      'https://busker.shop',
-      'https://port-0-busker-client-4fuvwk25lcrlelfh.gksl2.cloudtype.app',
-    ];
-    const origin = req.headers.origin;
-    if (originList.includes(origin)) {
-      res.setHeader('Access-Control-Allow-Origin', origin); //프론트와 연결
-    }
+    res.setHeader('Set-Cookie', `refreshToken=${refreshToken}; path=/;`);
+    // const originList = [
+    //   'http://localhost:3001',
+    //   'http://localhost:3000',
+    //   'https://busker.shop',
+    //   'https://port-0-busker-client-4fuvwk25lcrlelfh.gksl2.cloudtype.app',
+    // ];
+    // const origin = req.headers.origin;
+    // if (originList.includes(origin)) {
+    //   res.setHeader('Access-Control-Allow-Origin', origin); //프론트와 연결
+    // }
 
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader(
-      'Access-Control-Allow-Methods',
-      'GET, HEAD, POST, OPTIONS, PUT, PATCH, DELETE',
-    ); //method 지정
-    res.setHeader(
-      'Access-Control-Allow-Headers',
-      'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
-    );
-    res.setHeader(
-      'Set-Cookie',
-      `refreshToken=${refreshToken}; path=/; domain=.chansweb.shop; SameSite=None; Secure; httpOnly;`,
-    );
+    // res.setHeader('Access-Control-Allow-Credentials', 'true');
+    // res.setHeader(
+    //   'Access-Control-Allow-Methods',
+    //   'GET, HEAD, POST, OPTIONS, PUT, PATCH, DELETE',
+    // ); //method 지정
+    // res.setHeader(
+    //   'Access-Control-Allow-Headers',
+    //   'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
+    // );
+    // res.setHeader(
+    //   'Set-Cookie',
+    //   `refreshToken=${refreshToken}; path=/; domain=.chansweb.shop; SameSite=None; Secure; httpOnly;`,
+    // );
     return refreshToken;
   }
 
@@ -138,29 +139,30 @@ export class AuthService {
         },
       );
       // 쿠키 지움
-      const originList = [
-        'http://localhost:3000',
-        'https://busker.shop',
-        'https://port-0-busker-client-4fuvwk25lcrlelfh.gksl2.cloudtype.app',
-      ];
-      const origin = req.headers.origin;
-      if (originList.includes(origin)) {
-        res.setHeader('Access-Control-Allow-Origin', origin); //프론트와 연결
-      }
+      // const originList = [
+      //   'http://localhost:3001',
+      //   'http://localhost:3000',
+      //   'https://busker.shop',
+      //   'https://port-0-busker-client-4fuvwk25lcrlelfh.gksl2.cloudtype.app',
+      // ];
+      // const origin = req.headers.origin;
+      // if (originList.includes(origin)) {
+      //   res.setHeader('Access-Control-Allow-Origin', origin); //프론트와 연결
+      // }
 
-      res.setHeader('Access-Control-Allow-Credentials', 'true');
-      res.setHeader(
-        'Access-Control-Allow-Methods',
-        'GET, HEAD, POST, OPTIONS, PUT, PATCH, DELETE',
-      );
-      res.setHeader(
-        'Access-Control-Allow-Headers',
-        'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
-      );
-      res.setHeader(
-        'Set-Cookie',
-        `refreshToken=deleted; path=/; domain=.chansweb.shop; SameSite=None; Secure; httpOnly;`,
-      );
+      // res.setHeader('Access-Control-Allow-Credentials', 'true');
+      // res.setHeader(
+      //   'Access-Control-Allow-Methods',
+      //   'GET, HEAD, POST, OPTIONS, PUT, PATCH, DELETE',
+      // );
+      // res.setHeader(
+      //   'Access-Control-Allow-Headers',
+      //   'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
+      // );
+      // res.setHeader(
+      //   'Set-Cookie',
+      //   `refreshToken=deleted; path=/; domain=.chansweb.shop; SameSite=None; Secure; httpOnly;`,
+      // );
       if (saveAccess === 'OK' && saveRefresh === 'OK') {
         return true;
       } else {
