@@ -34,7 +34,7 @@ export class FilesService {
     return results;
   }
 
-  async uploadFile({ file }) {
+  uploadFile({ file }) {
     // storage 셋팅
     const uuid = uuid4();
     const bucket = process.env.GCP_BUSKER_BUCKET;
@@ -44,14 +44,13 @@ export class FilesService {
     }).bucket(bucket);
 
     // 스토리지에 파일 올리기
-    return await new Promise((resolve, reject) => {
-      file.createReadStream().pipe(
-        storage
-          .file(`${uuid}${file.filename}`)
-          .createWriteStream()
-          .on('finish', () => resolve(`${uuid}/${file.filename}`))
-          .on('error', () => reject('실패')),
-      );
-    });
+    const result = file
+      .createReadStream()
+      .pipe(storage.file(`${uuid}${file.filename}`).createWriteStream());
+    if (result) {
+      return `${uuid}${file.filename}`;
+    } else {
+      throw new UnprocessableEntityException('실패');
+    }
   }
 }

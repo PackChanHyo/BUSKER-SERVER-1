@@ -11,14 +11,15 @@ async function bootstrap() {
   app.use(json({ limit: '10mb' }));
   app.use(urlencoded({ limit: '10mb', extended: true }));
   app.useStaticAssets(join(__dirname, '..', 'static'));
-  app.enableCors({
-    origin: [
-      'https://busker.shop',
-      'http://localhost:3000',
-      'https://port-0-busker-client-4fuvwk25lcrlelfh.gksl2.cloudtype.app',
-    ],
-    credentials: true,
-  });
+  // app.enableCors({
+  //   origin: [
+  //     'http://localhost:3001',
+  //     'https://busker.shop',
+  //     'http://localhost:3000',
+  //     'https://port-0-busker-client-4fuvwk25lcrlelfh.gksl2.cloudtype.app',
+  //   ],
+  //   credentials: true,
+  // });
   app.useGlobalPipes(new ValidationPipe());
   app.use(graphqlUploadExpress());
   await app.listen(3000);
