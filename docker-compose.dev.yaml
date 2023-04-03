@@ -11,7 +11,7 @@ services:
       - 3000:3000
     env_file:
       - ./.env.dev
-  my-database:
+  busker-dev:
     platform: linux/x86_64
     image: mysql:latest
     environment:
