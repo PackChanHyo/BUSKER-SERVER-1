@@ -11,8 +11,9 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
     super({
       jwtFromRequest: (req) => {
         const cookie = req.headers.cookie;
-        console.log('cookie=', req.headers);
-        const refreshToken = cookie.replace('refreshToken=', '');
+        const refreshToken = cookie
+          ? cookie.replace('refreshToken=', '')
+          : null;
         return refreshToken;
       },
       secretOrKey: process.env.REFRESH_TOKEN_KEY,
@@ -21,6 +22,10 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
   }
 
   async validate(req, payload) {
+    const refreshCookie = req.headers.cookie;
+    if (!refreshCookie) {
+      throw new UnauthorizedException('유효하지 않은 refresh 토큰입니다.');
+    }
     const refresh = req.headers['cookie'].replace('refreshToken=', '');
     const cache = await this.cacheManager.get(`refreshToken:${refresh}`);
 
