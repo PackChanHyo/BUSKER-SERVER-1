@@ -10,33 +10,31 @@ interface IOAuthUser {
 
 @Controller()
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService, //
-  ) {}
-
-  @Get('/login/google')
-  @UseGuards(AuthGuard('google'))
-  async loginGoogle(
-    @Req() req: Request & IOAuthUser, //
-    @Res() res: Response,
-  ) {
-    this.authService.buskerSocialLogin({ req, res });
-  }
-
-  @Get('/login/kakao')
-  @UseGuards(AuthGuard('kakao'))
-  async loginKakao(
-    @Req() req: Request & IOAuthUser, //
-    @Res() res: Response,
-  ) {
-    this.authService.buskerSocialLogin({ req, res });
-  }
-  @Get('/login/facebook')
-  @UseGuards(AuthGuard('facebook'))
-  async loginFacebook(
-    @Req() req: Request & IOAuthUser, //
-    @Res() res: Response,
-  ) {
-    this.authService.buskerSocialLogin({ req, res });
-  }
+  // constructor(
+  //   private readonly authService: AuthService, //
+  // ) {}
+  // @Get('/login/google')
+  // @UseGuards(AuthGuard('google'))
+  // async loginGoogle(
+  //   @Req() req: Request & IOAuthUser, //
+  //   @Res() res: Response,
+  // ) {
+  //   this.authService.buskerSocialLogin({ req, res });
+  // }
+  // @Get('/login/kakao')
+  // @UseGuards(AuthGuard('kakao'))
+  // async loginKakao(
+  //   @Req() req: Request & IOAuthUser, //
+  //   @Res() res: Response,
+  // ) {
+  //   this.authService.buskerSocialLogin({ req, res });
+  // }
+  // @Get('/login/facebook')
+  // @UseGuards(AuthGuard('facebook'))
+  // async loginFacebook(
+  //   @Req() req: Request & IOAuthUser, //
+  //   @Res() res: Response,
+  // ) {
+  //   this.authService.buskerSocialLogin({ req, res });
+  // }
 }
