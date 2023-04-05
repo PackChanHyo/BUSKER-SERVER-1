@@ -101,12 +101,13 @@ export class AuthService {
         userId: user.id,
         password,
       });
-      this.setRefreshToken({
+      const token = this.setRefreshToken({
         user,
         res: context.res,
         req: context.req,
       });
       //
+      console.log(token);
       return await this.getAccessToken({ user });
     }
   }
