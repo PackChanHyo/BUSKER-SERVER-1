@@ -35,6 +35,6 @@ export class UserAuthority {
 
   @OneToOne(() => Artist, { nullable: true })
   @JoinColumn({ name: 'artistId' })
-  @Field(() => Artist)
+  @Field(() => Artist, { nullable: true })
   artist: Artist;
 }
