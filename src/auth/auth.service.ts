@@ -56,7 +56,7 @@ export class AuthService {
       );
       res.setHeader(
         'Set-Cookie',
-        `refreshToken=${refreshToken}; path=/; domain=.chansweb.shop; SameSite=None; Secure; httpOnly;`,
+        `refreshToken=${refreshToken}; path=/; domain=.chansweb.shop; SameSite=Lax; Secure; httpOnly;`,
       );
     }
 
@@ -163,7 +163,7 @@ export class AuthService {
       );
       res.setHeader(
         'Set-Cookie',
-        `refreshToken=; path=/; domain=.chansweb.shop; SameSite=None; Secure; httpOnly;`,
+        `refreshToken=; path=/; domain=.chansweb.shop; SameSite=Lax; Secure; httpOnly;`,
       );
       if (saveAccess === 'OK' && saveRefresh === 'OK') {
         return true;
