@@ -188,7 +188,7 @@ export class AuthService {
       );
       res.setHeader(
         'Set-Cookie',
-        `refreshToken=deleted; path=/; domain=.chansweb.shop; SameSite=None; Secure; httpOnly;`,
+        `refreshToken= ; path=/; domain=.chansweb.shop; SameSite=None; Secure; httpOnly;`,
       );
       if (saveAccess === 'OK' && saveRefresh === 'OK') {
         return true;
