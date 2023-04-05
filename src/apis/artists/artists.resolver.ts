@@ -42,8 +42,7 @@ export class ArtistsResolver {
     });
     return artist;
   }
-  @Roles(RoleType.USER)
-  @UseGuards(RolesGuard)
+
   @UseGuards(GqlAuthAccessGuard)
   @Query(() => Artist)
   async fetchArtist(@CurrentUser() currentUser: any) {
