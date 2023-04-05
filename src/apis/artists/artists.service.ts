@@ -35,7 +35,7 @@ export class ArtistsService {
       where: { id: artistId },
       relations: ['category'],
     });
-    if (!artist) return [];
+    if (!artist) return new Artist();
     return artist;
   }
 
