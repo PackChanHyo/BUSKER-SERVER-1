@@ -60,7 +60,7 @@ export class AuthService {
     );
     res.setHeader(
       'Set-Cookie',
-      `refreshToken=${refreshToken}; path=/; domain=.chansweb.shop; SameSite=None; Secure; httpOnly;`,
+      `refreshToken=${refreshToken}; path=/; domain=.chansweb.shop; SameSite=None; Secure=true; httpOnly;`,
     );
     // Deployment server
 
@@ -150,6 +150,9 @@ export class AuthService {
         'https://port-0-busker-client-4fuvwk25lcrlelfh.gksl2.cloudtype.app',
       ];
       const origin = req.headers.origin;
+      if (origin.includes('localhost')) {
+        res.setHeader('Set-Cookie', `refreshToken=deleted; path=/; `);
+      }
       if (originList.includes(origin)) {
         res.setHeader('Access-Control-Allow-Origin', origin); //프론트와 연결
       }
@@ -165,7 +168,7 @@ export class AuthService {
       );
       res.setHeader(
         'Set-Cookie',
-        `refreshToken=deleted; path=/; domain=.chansweb.shop; SameSite=None; Secure; httpOnly;`,
+        `refreshToken=deleted; path=/; domain=.chansweb.shop; SameSite=None; Secure=true; httpOnly;`,
       );
       if (saveAccess === 'OK' && saveRefresh === 'OK') {
         return true;
