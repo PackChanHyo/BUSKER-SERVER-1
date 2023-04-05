@@ -46,7 +46,7 @@ export class ArtistsResolver {
   @UseGuards(RolesGuard)
   @UseGuards(GqlAuthAccessGuard)
   @Query(() => Artist)
-  async fetchArtist(@CurrentUser() currentUser) {
+  async fetchArtist(@CurrentUser() currentUser: any) {
     const role = await this.roleService.findOneWithUserId({
       userId: currentUser.id,
     });
