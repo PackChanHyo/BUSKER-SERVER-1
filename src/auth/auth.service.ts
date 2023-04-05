@@ -43,25 +43,35 @@ export class AuthService {
       'https://port-0-busker-client-4fuvwk25lcrlelfh.gksl2.cloudtype.app',
     ];
     const origin = req.headers.origin;
-    if (originList.includes(origin)) {
+    if (origin.includes('localhost')) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      res.setHeader(
+        'Access-Control-Allow-Methods',
+        'GET, HEAD, POST, OPTIONS, PUT, PATCH, DELETE',
+      ); //method 지정
+      res.setHeader(
+        'Access-Control-Allow-Headers',
+        'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
+      );
+      res.setHeader('Set-Cookie', `refreshToken=${refreshToken}; path=/;`);
+    } else if (originList.includes(origin)) {
       res.setHeader('Access-Control-Allow-Origin', origin); //프론트와 연결
-    } else if (origin.includes('localhost')) {
-      res.setHeader('Set-Cookie', `refreshToken=${refreshToken}; path=/; `);
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      res.setHeader(
+        'Access-Control-Allow-Methods',
+        'GET, HEAD, POST, OPTIONS, PUT, PATCH, DELETE',
+      ); //method 지정
+      res.setHeader(
+        'Access-Control-Allow-Headers',
+        'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
+      );
+      res.setHeader(
+        'Set-Cookie',
+        `refreshToken=${refreshToken}; path=/; domain=.chansweb.shop; SameSite=None; Secure; httpOnly;`,
+      );
     }
 
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader(
-      'Access-Control-Allow-Methods',
-      'GET, HEAD, POST, OPTIONS, PUT, PATCH, DELETE',
-    ); //method 지정
-    res.setHeader(
-      'Access-Control-Allow-Headers',
-      'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
-    );
-    res.setHeader(
-      'Set-Cookie',
-      `refreshToken=${refreshToken}; path=/; domain=.chansweb.shop; SameSite=None; Secure=true; httpOnly;`,
-    );
     // Deployment server
 
     return refreshToken;
@@ -151,7 +161,17 @@ export class AuthService {
       ];
       const origin = req.headers.origin;
       if (origin.includes('localhost')) {
-        res.setHeader('Set-Cookie', `refreshToken=deleted; path=/; `);
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+        res.setHeader(
+          'Access-Control-Allow-Methods',
+          'GET, HEAD, POST, OPTIONS, PUT, PATCH, DELETE',
+        );
+        res.setHeader(
+          'Access-Control-Allow-Headers',
+          'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
+        );
+        res.setHeader('Set-Cookie', `refreshToken=deleted; path=/;`);
       }
       if (originList.includes(origin)) {
         res.setHeader('Access-Control-Allow-Origin', origin); //프론트와 연결
@@ -168,7 +188,7 @@ export class AuthService {
       );
       res.setHeader(
         'Set-Cookie',
-        `refreshToken=deleted; path=/; domain=.chansweb.shop; SameSite=None; Secure=true; httpOnly;`,
+        `refreshToken=deleted; path=/; domain=.chansweb.shop; SameSite=None; Secure; httpOnly;`,
       );
       if (saveAccess === 'OK' && saveRefresh === 'OK') {
         return true;
