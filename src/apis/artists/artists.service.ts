@@ -31,10 +31,12 @@ export class ArtistsService {
   }
 
   async findOne({ artistId }) {
-    return await this.artistRepository.findOne({
+    const artist = await this.artistRepository.findOne({
       where: { id: artistId },
       relations: ['category'],
     });
+    if (!artist) return [];
+    return artist;
   }
 
   async update({ artistId, updateArtistInput }) {
