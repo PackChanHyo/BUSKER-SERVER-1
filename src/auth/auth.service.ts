@@ -171,7 +171,7 @@ export class AuthService {
           'Access-Control-Allow-Headers',
           'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
         );
-        res.setHeader('Set-Cookie', `refreshToken=deleted; path=/;`);
+        res.setHeader('Set-Cookie', `refreshToken=; path=/;`);
       }
       if (originList.includes(origin)) {
         res.setHeader('Access-Control-Allow-Origin', origin); //프론트와 연결
