@@ -42,7 +42,7 @@ export class ArtistsResolver {
     });
     return artist;
   }
-  @Roles(RoleType.ARTIST)
+  @Roles(RoleType.USER)
   @UseGuards(RolesGuard)
   @UseGuards(GqlAuthAccessGuard)
   @Query(() => Artist)

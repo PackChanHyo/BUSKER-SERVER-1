@@ -11,7 +11,9 @@ export class RoleService {
   ) {}
 
   async findOneWithUserId({ userId }) {
-    return await this.userAuthorityRepository.findOne({ where: { userId } });
+    return await this.userAuthorityRepository.findOne({
+      where: { userId },
+    });
   }
 
   async create({ userId, authority, artistId }) {
