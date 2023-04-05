@@ -175,23 +175,23 @@ export class AuthService {
     }
   }
 
-  async buskerSocialLogin({ req, res }) {
-    // 1. 회원 조회
-    let user = await this.userService.findOneByEmail({ email: req.user.email });
+  // async buskerSocialLogin({ req, res }) {
+  //   // 1. 회원 조회
+  //   let user = await this.userService.findOneByEmail({ email: req.user.email });
 
-    // 2. 회원가입이 안되어있다면? 자동 회원가입
-    if (!user) {
-      user = await this.userService.create({
-        email: req.user.email,
-        password: req.user.password,
-        userImageURL: req.user.userImageURL,
-      });
-    }
+  //   // 2. 회원가입이 안되어있다면? 자동 회원가입
+  //   if (!user) {
+  //     user = await this.userService.create({
+  //       email: req.user.email,
+  //       password: req.user.password,
+  //       userImageURL: req.user.userImageURL,
+  //     });
+  //   }
 
-    // 3. 회원가입이 되어있다면? 로그인(refreshToken, accessToken 만들어서 프론트엔드에 주기)
-    this.setRefreshToken({ user, res, req });
-    res.redirect(
-      'https://port-0-busker-client-4fuvwk25lcrlelfh.gksl2.cloudtype.app',
-    );
-  }
+  //   // 3. 회원가입이 되어있다면? 로그인(refreshToken, accessToken 만들어서 프론트엔드에 주기)
+  //   this.setRefreshToken({ user, res, req });
+  //   res.redirect(
+  //     'https://port-0-busker-client-4fuvwk25lcrlelfh.gksl2.cloudtype.app',
+  //   );
+  // }
 }
