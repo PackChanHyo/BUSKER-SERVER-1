@@ -45,6 +45,8 @@ export class AuthService {
     const origin = req.headers.origin;
     if (originList.includes(origin)) {
       res.setHeader('Access-Control-Allow-Origin', origin); //프론트와 연결
+    } else if (origin.includes('localhost')) {
+      res.setHeader('Set-Cookie', `refreshToken=${refreshToken}; path=/; `);
     }
 
     res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -60,6 +62,8 @@ export class AuthService {
       'Set-Cookie',
       `refreshToken=${refreshToken}; path=/; domain=.chansweb.shop; SameSite=None; Secure; httpOnly;`,
     );
+    // Deployment server
+
     return refreshToken;
   }
 
