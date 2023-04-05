@@ -3,22 +3,26 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 import { AuthGuard } from '@nestjs/passport';
 
 export class GqlAuthAccessGuard extends AuthGuard('access') {
-  getRequest(context: ExecutionContext) {
+  async getRequest(context: ExecutionContext) {
     const gqlContext = GqlExecutionContext.create(context);
-    return gqlContext.getContext().req;
+    return await gqlContext.getContext().req;
   }
 }
 
 export class GqlAuthRefreshGuard extends AuthGuard('refresh') {
-  getRequest(context: ExecutionContext) {
+  async getRequest(context: ExecutionContext) {
     const gqlContext = GqlExecutionContext.create(context);
-    return gqlContext.getContext().req;
+    return await gqlContext.getContext().req;
   }
 
   handleRequest(err, user, info) {
-    if (err || !user) {
-      throw err || info;
+    try {
+      if (err || !user) {
+        throw err || info;
+      }
+      return user;
+    } catch (error) {
+      console.error(error);
     }
-    return user;
   }
 }
